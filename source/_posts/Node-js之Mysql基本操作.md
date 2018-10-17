@@ -12,7 +12,7 @@ npm i -d mysql
 ```
 <!-- more -->
 如下图所示安装完成：
-![在这里插入图片描述](https://github.com/usthooz/ooz.org/tree/page/source/_posts/img/20181017174458551.png)
+![在这里插入图片描述](20181017174458551.png)
 
 ### 数据库连接
 ```
@@ -63,7 +63,7 @@ conn.query(insertSql, insertParams, function (err, results) {
 });
 ```
 执行结果如图：
-![在这里插入图片描述](https://github.com/usthooz/ooz.org/tree/page/source/_posts/img/20181017191726878.png)
+![在这里插入图片描述](20181017191726878.png)
 
 #### 查询
 ```
@@ -80,7 +80,7 @@ conn.query(sql,function (err,results) {
 });
 ```
 执行结果如图：
-![在这里插入图片描述](https://github.com/usthooz/ooz.org/tree/page/source/_posts/img/2018101719185346.png)
+![在这里插入图片描述](2018101719185346.png)
 
 #### 更新
 ```
@@ -98,7 +98,7 @@ conn.query(updateSql,updateParams,function (err,results) {
 });
 ```
 执行结果如图：
-![在这里插入图片描述](https://github.com/usthooz/ooz.org/tree/page/source/_posts/img/2018101719191699.png)
+![在这里插入图片描述](2018101719191699.png)
 
 #### 删除
 ```
@@ -116,7 +116,7 @@ conn.query(deleteSql,deleteParams,function (err,results) {
 });
 ```
 执行结果如图：
-![在这里插入图片描述](https://github.com/usthooz/ooz.org/tree/page/source/_posts/img/20181017191931575.png)
+![在这里插入图片描述](20181017191931575.png)
 
 ### 完整代码
 [点击查看](https://github.com/usthooz/program_lan/blob/master/js/mysql/mysql.js)
