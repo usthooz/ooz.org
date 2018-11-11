@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="开源项目," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="概述oozgconf是一个基于Golang开发的轻量配置文件加载工具，目前支持json、toml、yaml、xml等格式。">
+<meta name="keywords" content="开源项目">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Golang配置文件解析-oozgconf">
+<meta property="og:url" content="http://www.ooz.ink/2018/11/11/Golang配置文件解析-oozgconf/index.html">
+<meta property="og:site_name" content="OOZ">
+<meta property="og:description" content="概述oozgconf是一个基于Golang开发的轻量配置文件加载工具，目前支持json、toml、yaml、xml等格式。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://www.ooz.ink/2018/11/11/Golang配置文件解析-oozgconf/design.png">
+<meta property="og:image" content="http://www.ooz.ink/2018/11/11/Golang配置文件解析-oozgconf/tree.png">
+<meta property="og:image" content="http://www.ooz.ink/2018/11/11/Golang配置文件解析-oozgconf/result.png">
+<meta property="og:updated_time" content="2018-11-11T01:57:54.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Golang配置文件解析-oozgconf">
+<meta name="twitter:description" content="概述oozgconf是一个基于Golang开发的轻量配置文件加载工具，目前支持json、toml、yaml、xml等格式。">
+<meta name="twitter:image" content="http://www.ooz.ink/2018/11/11/Golang配置文件解析-oozgconf/design.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.ooz.ink/2018/11/11/Golang配置文件解析-oozgconf/"/>
+
+
+
+
+
+  <title>Golang配置文件解析-oozgconf | OOZ</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">OOZ</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-schedule">
+          <a href="/schedule/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-calendar"></i> <br />
+            
+            日程表
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-sitemap">
+          <a href="https://github.com/usthooz" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br />
+            
+            项目
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.ooz.ink/2018/11/11/Golang配置文件解析-oozgconf/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="OOZ">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="OOZ">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Golang配置文件解析-oozgconf</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-11-11T09:47:17+08:00">
+                2018-11-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Golang/" itemprop="url" rel="index">
+                    <span itemprop="name">Golang</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><p>oozgconf是一个基于Golang开发的轻量配置文件加载工具，目前支持json、toml、yaml、xml等格式。</p>
+<a id="more"></a>
+<h3 id="功能"><a href="#功能" class="headerlink" title="功能"></a>功能</h3><ul>
+<li>配置文件读取</li>
+<li>配置文件解析</li>
+</ul>
+<h3 id="支持配置文件格式"><a href="#支持配置文件格式" class="headerlink" title="支持配置文件格式"></a>支持配置文件格式</h3><ul>
+<li>.json</li>
+<li>.toml</li>
+<li>.xml</li>
+<li>.yaml</li>
+</ul>
+<h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ go get -u github.com/usthooz/oozgconf</span><br></pre></td></tr></table></figure>
+<h3 id="实现思路"><a href="#实现思路" class="headerlink" title="实现思路"></a>实现思路</h3><p>在后端项目中，配置文件已经是一个不可或缺的东西了，格式也是多种多样。</p>
+<h4 id="流程结构"><a href="#流程结构" class="headerlink" title="流程结构"></a>流程结构</h4><p>如下图所示为项目实现流程及结构：<br><img src="/2018/11/11/Golang配置文件解析-oozgconf/design.png" alt="在这里插入图片描述"></p>
+<h4 id="代码目录结构"><a href="#代码目录结构" class="headerlink" title="代码目录结构"></a>代码目录结构</h4><p><img src="/2018/11/11/Golang配置文件解析-oozgconf/tree.png" alt="在这里插入图片描述"></p>
+<h4 id="主要代码"><a href="#主要代码" class="headerlink" title="主要代码"></a>主要代码</h4><ul>
+<li><p>配置文件后缀名常量定义</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">const (</span><br><span class="line">    JsonSub string = &quot;json&quot;</span><br><span class="line">    YamlSub string = &quot;yaml&quot;</span><br><span class="line">    TomlSub string = &quot;toml&quot;</span><br><span class="line">    XmlSub  string = &quot;xml&quot;</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>对象结构</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">type OozGconf struct &#123;</span><br><span class="line">    // ConfPath config file path-&gt;default: ./config/config.yaml</span><br><span class="line">    ConfPath string</span><br><span class="line">    // Subffix config file subffix</span><br><span class="line">    Subffix string</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>新建gconf对象<br>在使用时，如果不指定配置文件的路径，那么默认为./config/config.yaml，同时如果不指定文件类型，则自动通过解析文件名来获得配置文件的后缀。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">// NewConf new conf object</span><br><span class="line">func NewConf(confParam *OozGconf) *OozGconf &#123;</span><br><span class="line">    if len(confParam.ConfPath) == 0 &#123;</span><br><span class="line">        confParam.ConfPath = &quot;./config/config.yaml&quot;</span><br><span class="line">    &#125;</span><br><span class="line">    return confParam</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>获取配置</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">/*</span><br><span class="line">    confpath: config file path-&gt;default: ./config/config.yaml</span><br><span class="line">    subffix: config file subffie-&gt;option</span><br><span class="line">*/</span><br><span class="line">func (oozConf *OozGconf) GetConf(conf interface&#123;&#125;) error &#123;</span><br><span class="line">    // read config file</span><br><span class="line">    bs, err := ioutil.ReadFile(oozConf.ConfPath)</span><br><span class="line">    if err != nil &#123;</span><br><span class="line">        return err</span><br><span class="line">    &#125;</span><br><span class="line">    if len(oozConf.Subffix) == 0 &#123;</span><br><span class="line">        // get file subffix</span><br><span class="line">        oozConf.Subffix = strings.Trim(path.Ext(path.Base(oozConf.ConfPath)), &quot;.&quot;)</span><br><span class="line">    &#125;</span><br><span class="line">    // check analy</span><br><span class="line">    switch oozConf.Subffix &#123;</span><br><span class="line">    case JsonSub:</span><br><span class="line">        err = json.Unmarshal(bs, conf)</span><br><span class="line">    case TomlSub:</span><br><span class="line">        err = toml.Unmarshal(bs, conf)</span><br><span class="line">    case YamlSub:</span><br><span class="line">        err = yaml.Unmarshal(bs, conf)</span><br><span class="line">    case XmlSub:</span><br><span class="line">        err = xml.Unmarshal(bs, conf)</span><br><span class="line">    default:</span><br><span class="line">        err = fmt.Errorf(&quot;GetConf: non support this file type...&quot;)</span><br><span class="line">    &#125;</span><br><span class="line">    return err</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="使用例程"><a href="#使用例程" class="headerlink" title="使用例程"></a>使用例程</h3><ul>
+<li>example<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">import (</span><br><span class="line">    &quot;github.com/usthooz/oozgconf&quot;</span><br><span class="line">    &quot;github.com/usthooz/oozlog/go&quot;</span><br><span class="line">)</span><br><span class="line">type Config struct &#123;</span><br><span class="line">    Author string</span><br><span class="line">    Mysql  struct &#123;</span><br><span class="line">        User     string</span><br><span class="line">        Password string</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">func main() &#123;</span><br><span class="line">    var (</span><br><span class="line">        conf Config</span><br><span class="line">    )</span><br><span class="line">    // new conf object</span><br><span class="line">    ozconf := oozgconf.NewConf(&amp;oozgconf.OozGconf&#123;</span><br><span class="line">        ConfPath: &quot;./config.json&quot;, // 可选，默认为./config/config.yaml</span><br><span class="line">        Subffix:  &quot;&quot;, // 可选，如果不指定则自动解析文件名获取</span><br><span class="line">    &#125;)</span><br><span class="line">    // get config</span><br><span class="line">    err := ozconf.GetConf(&amp;conf)</span><br><span class="line">    if err != nil &#123;</span><br><span class="line">        uoozg.Errorf(&quot;GetConf Err: %v&quot;, err.Error())</span><br><span class="line">    &#125;</span><br><span class="line">    uoozg.Infof(&quot;Res: %v&quot;, conf)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h4 id="运行结果"><a href="#运行结果" class="headerlink" title="运行结果"></a>运行结果</h4><p><img src="/2018/11/11/Golang配置文件解析-oozgconf/result.png" alt="在这里插入图片描述"></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/开源项目/" rel="tag"># 开源项目</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/10/17/Node-js之Mysql基本操作/" rel="next" title="Node.js之Mysql基本操作">
+                <i class="fa fa-chevron-left"></i> Node.js之Mysql基本操作
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">OOZ</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#功能"><span class="nav-number">2.</span> <span class="nav-text">功能</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#支持配置文件格式"><span class="nav-number">3.</span> <span class="nav-text">支持配置文件格式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装"><span class="nav-number">4.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实现思路"><span class="nav-number">5.</span> <span class="nav-text">实现思路</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#流程结构"><span class="nav-number">5.1.</span> <span class="nav-text">流程结构</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#代码目录结构"><span class="nav-number">5.2.</span> <span class="nav-text">代码目录结构</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#主要代码"><span class="nav-number">5.3.</span> <span class="nav-text">主要代码</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用例程"><span class="nav-number">6.</span> <span class="nav-text">使用例程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#运行结果"><span class="nav-number">6.1.</span> <span class="nav-text">运行结果</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <a target="_blank" href="https://github.com/usthooz"><span class="author" itemprop="copyrightHolder">USTH-OOZ</span></a>
+
+  
+</div>
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
